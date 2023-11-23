@@ -1,8 +1,11 @@
-"""Url Shortner Frontend And Backend"""
 from os.path import exists
 from nicegui import ui
 from random import randbytes
 from base64 import b64encode
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+
+app = FastAPI()
 
 
 @ui.page("/app")
@@ -11,7 +14,7 @@ def app() -> None:
     Summary: Represents the app page.
 
     Explanation:
-    This function represents the app page. It creates an input field and a label for displaying a shortened link. When the user enters a URL and presses enter, it generates a shortened link using the `makelink` function and displays it in the label.
+    This function represents the app page. It creates an input field and a label for displaying a shortened link. When the user enters a URL and presses enter, it generates a shortened link using the `makelink` function and redirects to the link page.
 
     Args:
     - None
@@ -31,7 +34,7 @@ def app() -> None:
         Summary: Handles the event when the user presses enter in the input field.
 
         Explanation:
-        This function is called when the user presses enter in the input field. It generates a shortened link using the `makelink` function with the value of the input field, and sets the text of the link label to the shortened link.
+        This function is called when the user presses enter in the input field. It generates a shortened link using the `makelink` function with the value of the input field and redirects to the link page.
 
         Args:
         - None
@@ -44,7 +47,8 @@ def app() -> None:
         """
 
         shortened_link: str = makelink(link=input_field.value)
-        link_label.set_text(text=shortened_link)
+        redirect_url = f"/link/{shortened_link}"
+        raise RedirectResponse(redirect_url)
 
     input_field.on(type="keydown.enter", handler=on_enter)
     link_label = ui.label(text="")
@@ -52,10 +56,10 @@ def app() -> None:
 
 def writelink(name: str, link: str) -> str:
     """
-    Summary: Writes a link to a file and updates the UI.
+    Summary: Writes a link to a file.
 
     Explanation:
-    This function takes a name and a link as input and writes them to a file named "urls.txt". It also updates the UI by adding a new page and a corresponding function that opens the provided link when accessed. Finally, it opens the "/link/" page in the UI. The function returns the name of the link.
+    This function takes a name and a link as input and writes them to a file named "urls.txt". It returns the name of the link.
 
     Args:
     - name (str): The key of the link.
@@ -68,17 +72,9 @@ def writelink(name: str, link: str) -> str:
     - None
     """
 
-    if exists("urls.txt"):
-        with open("urls.txt", "a") as file:
-            file.write(f"{name} {link}")
-        with open(__file__, "a") as file:
-            file.writelines(
-                [f"\n@ui.page(\"/link/{name}\")\n", f"def {name}(): ui.open(\"{link}\")"])
-            ui.open("./link/")
-        return name
-    else:
-        with open("urls.txt", "w"):
-            file.write("")
+    with open("urls.txt", "a") as file:
+        file.write(f"{name} {link}\n")
+    return name
 
 
 def makelink(link: str) -> str:
@@ -104,10 +100,9 @@ def makelink(link: str) -> str:
         with open("urls.txt", "r") as file:
             content = file.read()
         if name in content:
-            return makelink(link=link)  # Return the recursive call
+            return makelink(link=link)
         else:
             return writelink(name=name, link=link)
-
     else:
         with open("urls.txt", "w") as file:
             file.write("")
@@ -132,13 +127,10 @@ def link() -> None:
     - None
     """
 
-    if exists("urls.txt"):
-        with open("urls.txt", "r") as file:
-            content: str = file.read()
-            ui.label(text=content)
-    else:
-        with open("urls.txt", "w") as file:
-            file.write("")
+    with open("urls.txt", "r") as file:
+        content: str = file.read()
+        ui.label(text=content)
 
 
-ui.run(title="Url Shortener")
+if __name__ == "__main__":
+    app.run(title="Url Shortener")
