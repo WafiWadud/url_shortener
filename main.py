@@ -133,4 +133,4 @@ def link() -> None:
 
 
 if __name__ == "__main__":
-    app.run(title="Url Shortener")
+    ui.run(title="Url Shortener")
