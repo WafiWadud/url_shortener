@@ -27,7 +27,7 @@ def makelink(link) -> str:
             makelink(link)
         else:
             with open(__file__, "a") as file:
-                file.writelines(["from nicegui import ui\n", f"@ui.page(\"/link/{name}\")", f"def {name}: ui.open({link})"])
+                file.writelines([f"@ui.page(\"/link/{name}\")", f"def {name}: ui.open({link})"])
 
     with open("urls.txt", "a") as file:
         file.write(name)
