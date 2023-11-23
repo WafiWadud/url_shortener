@@ -9,7 +9,7 @@ def app() -> None:
     link_label = ui.label(text="")
     def on_enter():
         shortened_link = makelink(input_field.value)
-        link_label.set(shortened_link)
+        link_label.set_text(shortened_link)
     input_field.on("keydown.enter", on_enter)
     link_label = ui.label(text="")
 
