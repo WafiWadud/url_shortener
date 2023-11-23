@@ -7,9 +7,10 @@ def app() -> None:
     input_field = ui.input(label="Enter A Url")
     link_label = ui.label(text="")
     def on_enter():
-        shortened_link = makelink(input_field.get())
+        shortened_link = makelink(input_field.value)
         link_label.set(shortened_link)
     input_field.on("keydown.enter", on_enter)
+    link_label = ui.label(text="")
 
 def makelink(link) -> str:
     name = randbytes(6)
