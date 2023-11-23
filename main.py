@@ -2,6 +2,7 @@
 from os import listdir
 from nicegui import ui
 from random import randbytes
+from base64 import b64encode
 @ui.page("/app")
 def app() -> None:
     input_field = ui.input(label="Enter A Url")
@@ -13,10 +14,10 @@ def app() -> None:
     link_label = ui.label(text="")
 
 def makelink(link) -> str:
-    name = randbytes(6)
+    name = b64encode(randbytes(6)).decode()
     if name and name + ".py" in listdir():
         return
-    with open(file=name, mode="w") as file:
+    with open(file=name + ".py", mode="w") as file:
         file.writelines(f"from nicegui import ui\n@ui.page(\"{name}\")\ndef {name}: ui.open(\"{link}\")")
     return name
 
