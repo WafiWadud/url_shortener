@@ -23,15 +23,14 @@ def makelink(link) -> str:
     if exists("urls.txt"):
         with open("urls.txt", "r") as file:
             content = file.read()
+        with open("urls.txt", "a") as file:
+            file.write(name)
         if name in content:
             makelink(link)
         else:
             with open(__file__, "a") as file:
-                file.writelines([f"\n@ui.page(\"/link/{name}\")\n", f"def {name}(): ui.open({link})"])
+                file.writelines([f"\n@ui.page(\"/link/{name}\")\n", f"def {name}(): ui.open(\"{link}\")"])
             return name
-
-    with open("urls.txt", "a") as file:
-        file.write(name)
     makelink(link)
     return name
 
