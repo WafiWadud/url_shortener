@@ -34,5 +34,9 @@ def makelink(link) -> str:
     makelink(link)
     return name
 
-
+@ui.page("/link")
+def link():
+    with open("urls.txt", "r") as file:
+        content = file.read()
+        ui.label(content)
 ui.run(title="Url Shortener")
