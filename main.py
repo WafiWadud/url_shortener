@@ -18,3 +18,5 @@ def makelink(link) -> str:
     with open(file=name, mode="w") as file:
         file.writelines(f"from nicegui import ui\n@ui.page(\"{name}\")\ndef {name}: ui.open(\"{link}\")")
     return name
+
+ui.run(title="Url Shortener")
