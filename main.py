@@ -27,7 +27,6 @@ def app() -> None:
     """
 
     input_field = ui.input(label="Enter A Url")
-    link_label = ui.label(text="")
 
     def on_enter() -> None:
         """
@@ -51,7 +50,6 @@ def app() -> None:
         raise RedirectResponse(redirect_url)
 
     input_field.on(type="keydown.enter", handler=on_enter)
-    link_label = ui.label(text="")
 
 
 def writelink(name: str, link: str) -> str:
