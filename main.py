@@ -24,7 +24,7 @@ def makelink(link) -> str:
         with open("urls.txt", "r") as file:
             content = file.read()
         with open("urls.txt", "a") as file:
-            file.write(name)
+            file.write(f"{name} {link}")
         if name in content:
             makelink(link)
         else:
