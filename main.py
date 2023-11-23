@@ -28,9 +28,11 @@ def makelink(link) -> str:
         else:
             with open(__file__, "a") as file:
                 file.writelines([f"@ui.page(\"/link/{name}\")", f"def {name}: ui.open({link})"])
+            return name
 
     with open("urls.txt", "a") as file:
         file.write(name)
+    makelink(link)
     return name
 
 
