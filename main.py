@@ -131,6 +131,4 @@ def link() -> None:
         content: str = file.read()
         ui.label(text=content)
 
-
-if __name__ == "__main__":
-    ui.run(title="Url Shortener")
+ui.run(title="Url Shortener")
