@@ -9,14 +9,16 @@ lock = Lock()
 
 @ui.page("/app")
 def app() -> None:
-    input_field = ui.input(label="Enter A Url")
-    link_label = ui.label(text="")
+    with ui.row():
+        with ui.column(gap=10, justify='center', align='center'):
+            input_field = ui.input(label="Enter A Url")
+            link_label = ui.label(text="")
 
-    def on_enter() -> None:
-        shortened_link: str = makelink(link=input_field.value)
-        link_label.set_text(text=shortened_link)
+            def on_enter() -> None:
+                shortened_link: str = makelink(link=input_field.value)
+                link_label.set_text(text=shortened_link)
 
-    input_field.on(type="keydown.enter", handler=on_enter)
+            input_field.on(type="keydown.enter", handler=on_enter)
 
 
 def writelink(name: str, link: str) -> str:
@@ -56,8 +58,10 @@ def redirect_to_link(shortened_link: str) -> None:
                             link = link.replace("https://", "https://www.")
                         case _ if not link.startswith("www.") and not link.startswith("https://"):
                             link = "https://www." + link
-                    ui.button("goto link?",
-                              on_click=lambda: ui.open(f'{link}'))
+                    with ui.row():
+                        with ui.column():
+                            ui.button("goto link?",
+                                      on_click=lambda: ui.open(f'{link}'))
 
 
 ui.run(title="Url Shortener", tailwind=False)
