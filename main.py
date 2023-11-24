@@ -8,7 +8,7 @@ lock = Lock()
 
 
 @ui.page("/app")
-def app2() -> None:
+def app() -> None:
     input_field = ui.input(label="Enter A Url")
     link_label = ui.label(text="")
 
@@ -17,15 +17,14 @@ def app2() -> None:
         link_label.set_text(text=shortened_link)
 
     input_field.on(type="keydown.enter", handler=on_enter)
-    link_label = ui.label(text="")
 
 
 def writelink(name: str, link: str) -> str:
     with lock:
-        mode = "a" if exists("urls.txt") else "w"
+        mode: str = "a" if exists("urls.txt") else "w"
         with open("urls.txt", mode) as file:
             file.write(f"\n{name} {link}")
-    return f"./link/{name}"
+    return f"{name}"
 
 
 def makelink(link: str) -> str:
@@ -44,7 +43,7 @@ def makelink(link: str) -> str:
 
 
 @ui.page("/link/{shortened_link}")
-def redirect_to_link(shortened_link: str):
+def redirect_to_link(shortened_link: str) -> None:
     if exists("urls.txt"):
         with open("urls.txt", "r") as file:
             for line in file:
