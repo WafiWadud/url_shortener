@@ -23,7 +23,7 @@ def writelink(name: str, link: str) -> str:
     with lock:
         mode: str = "a" if exists("urls.txt") else "w"
         with open("urls.txt", mode) as file:
-            file.write(f"\n{name} {link}")
+            file.write(f"{name} {link}\n")
     return f"{name}"
 
 
