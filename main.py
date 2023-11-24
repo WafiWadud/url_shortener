@@ -9,8 +9,8 @@ lock = Lock()
 
 @ui.page("/app")
 def app() -> None:
-    with ui.row():
-        with ui.column(gap=10, justify='center', align='center'):
+    with ui.row(justify='center', align='center'):
+        with ui.column(justify='center', align='center'):
             input_field = ui.input(label="Enter A Url")
             link_label = ui.label(text="")
 
@@ -58,8 +58,8 @@ def redirect_to_link(shortened_link: str) -> None:
                             link = link.replace("https://", "https://www.")
                         case _ if not link.startswith("www.") and not link.startswith("https://"):
                             link = "https://www." + link
-                    with ui.row():
-                        with ui.column():
+                    with ui.row(justify='center', align='center'):
+                        with ui.column(justify='center', align='center'):
                             ui.button("goto link?",
                                       on_click=lambda: ui.open(f'{link}'))
 
