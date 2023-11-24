@@ -1,132 +1,64 @@
+"""Url Shortner Frontend And Backend"""
 from os.path import exists
 from nicegui import ui
-from random import randbytes
-from base64 import b64encode
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from random import choices
+from threading import Lock
 
-app = FastAPI()
+lock = Lock()
 
 
 @ui.page("/app")
-def app() -> None:
-    """
-    Summary: Represents the app page.
-
-    Explanation:
-    This function represents the app page. It creates an input field and a label for displaying a shortened link. When the user enters a URL and presses enter, it generates a shortened link using the `makelink` function and redirects to the link page.
-
-    Args:
-    - None
-
-    Returns:
-    - None
-
-    Examples:
-    - None
-    """
-
+def app2() -> None:
     input_field = ui.input(label="Enter A Url")
+    link_label = ui.label(text="")
 
     def on_enter() -> None:
-        """
-        Summary: Handles the event when the user presses enter in the input field.
-
-        Explanation:
-        This function is called when the user presses enter in the input field. It generates a shortened link using the `makelink` function with the value of the input field and redirects to the link page.
-
-        Args:
-        - None
-
-        Returns:
-        - None
-
-        Examples:
-        - None
-        """
-
         shortened_link: str = makelink(link=input_field.value)
-        redirect_url = f"/link/{shortened_link}"
-        raise RedirectResponse(redirect_url)
+        link_label.set_text(text=shortened_link)
 
     input_field.on(type="keydown.enter", handler=on_enter)
+    link_label = ui.label(text="")
 
 
 def writelink(name: str, link: str) -> str:
-    """
-    Summary: Writes a link to a file.
-
-    Explanation:
-    This function takes a name and a link as input and writes them to a file named "urls.txt". It returns the name of the link.
-
-    Args:
-    - name (str): The key of the link.
-    - link (str): The URL to be associated with the link.
-
-    Returns:
-    - str: The key of the link.
-
-    Examples:
-    - None
-    """
-
-    with open("urls.txt", "a") as file:
-        file.write(f"{name} {link}\n")
-    return name
+    with lock:
+        mode = "a" if exists("urls.txt") else "w"
+        with open("urls.txt", mode) as file:
+            file.write(f"\n{name} {link}")
+    return f"./link/{name}"
 
 
 def makelink(link: str) -> str:
-    """
-    Summary: Generates a unique key for a link and writes it to a file.
-
-    Explanation:
-    This function takes a link as input and generates a unique key for it using base64 encoding and random bytes. It checks if the key already exists in the "urls.txt" file. If it does, it recursively calls itself to generate a new key. If the key is unique, it writes the key and link to the file using the `writelink` function.
-
-    Args:
-    - link (str): The URL to be associated with the link.
-
-    Returns:
-    - str: The generated key for the link.
-
-    Examples:
-    - None
-    """
-
-    name: str = b64encode(randbytes(6)).decode()
+    validletters: list[str] = ["A", "a", "B", "b", "C", "c", "D", "d"]
+    name: str = ''.join(choices(validletters, k=6))
     content: str = ""
+    if not exists("urls.txt"):
+        return writelink(name=name, link=link)
+    with open("urls.txt", "r") as file:
+        content = file.read()
+    return (
+        makelink(link=link)
+        if name in content
+        else writelink(name=name, link=link)
+    )
+
+
+@ui.page("/link/{shortened_link}")
+def redirect_to_link(shortened_link: str):
     if exists("urls.txt"):
         with open("urls.txt", "r") as file:
-            content = file.read()
-        if name in content:
-            return makelink(link=link)
-        else:
-            return writelink(name=name, link=link)
-    else:
-        with open("urls.txt", "w") as file:
-            file.write("")
-        return writelink(name=name, link=link)
+            for line in file:
+                name, link = line.split()
+                if name == shortened_link:
+                    match link:
+                        case _ if link.startswith("www.") and not link.startswith("https://"):
+                            link = "https://" + link
+                        case _ if link.startswith("https://") and not link.startswith("https://www."):
+                            link = link.replace("https://", "https://www.")
+                        case _ if not link.startswith("www.") and not link.startswith("https://"):
+                            link = "https://www." + link
+                    ui.button("goto link?",
+                              on_click=lambda: ui.open(f'{link}'))
 
 
-@ui.page("/link")
-def link() -> None:
-    """
-    Summary: Represents the link page.
-
-    Explanation:
-    This function represents the link page. It reads the content of the "urls.txt" file and displays it in a label on the UI.
-
-    Args:
-    - None
-
-    Returns:
-    - None
-
-    Examples:
-    - None
-    """
-
-    with open("urls.txt", "r") as file:
-        content: str = file.read()
-        ui.label(text=content)
-
-ui.run(title="Url Shortener")
+ui.run(title="Url Shortener", tailwind=False)
