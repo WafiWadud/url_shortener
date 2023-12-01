@@ -7,7 +7,7 @@ from threading import Lock
 lock = Lock()
 
 
-@ui.page("/app")
+@ui.page("/")
 def app() -> None:
     with ui.row(justify='center', align='center'):
         with ui.column(justify='center', align='center'):
